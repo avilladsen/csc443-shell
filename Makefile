@@ -8,7 +8,7 @@ SRCDIR = src
 OBJDIR = obj
 BINDIR = bin
 
-OBJECTS = $(OBJDIR)/main.o
+OBJECTS = $(OBJDIR)/main.o $(OBJDIR)/parser.o
 
 $(BINDIR)/$(TARGET): $(OBJECTS)
 	@$(CC) $(OBJECTS) -o $@
@@ -16,11 +16,14 @@ $(BINDIR)/$(TARGET): $(OBJECTS)
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/main.o: $(SRCDIR)/main.c
+$(OBJDIR)/main.o: $(SRCDIR)/main.c $(SRCDIR)/parser.h $(SRCDIR)/command.h
 
+$(OBJDIR)/parser.o: $(SRCDIR)/parser.c $(SRCDIR)/parser.h $(SRCDIR)/command.h
 
-main.c: 
+clean:
+	rm shell $(OBJECTS)
 
+.PHONY: clean
 
 
 
