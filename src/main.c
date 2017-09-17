@@ -1,17 +1,14 @@
 #include <stdlib.h>
-#include <unistd.h>
 #include <stdbool.h>
-#include <string.h>
 
 #include "read.h"
 #include "write.h"
 #include "command.h"
 #include "parser.h"
+#include "execute.h"
 
-#define INPUT_BUFFER_SIZE 1024
-
+#ifdef DEBUG_PARSER
 // Print a Command.
-// For debugging purposes.
 void print_command(struct Command *command) {
   if (command->input != NULL) {
     write_out("input: ");
@@ -32,23 +29,39 @@ void print_command(struct Command *command) {
     write_out("ERROR: multiple outputs\n");
   }
 
-
-
   for (int i = 0; i < command->args_count; i++) {
     write_out("arg: ");
     write_out(command->args[i]);
     write_out("\n");
   }
 }
+#endif /* DEBUG_PARSER */
 
+void prompt() {
+#ifndef NO_PROMPT
+  char cwd[256];
+  if (getcwd(cwd, 256) == NULL) {
+    write_error("shell: error getting current working directory\n");
+  } else {
+    write_out(cwd);
+  }
+  write_out("$ ");
+#endif
+}
 
 void main() {
   while(true) {
+    prompt();
     struct Reader *reader = create_reader(STDIN_FILENO);
     
     char *line = read_until(reader, '\n');
     struct Command *command = parse_command(line);
+
+#ifdef DEBUG_PARSER
     print_command(command);
+#else
+    execute_command(command);
+#endif
 
     free(line);
     parser_free_command(command);

@@ -16,6 +16,7 @@ struct Command *create_parser_result(char *command_line) {
   command->internal_args_ptr = malloc((strlen(command_line)+1)*sizeof(char));
   strcpy(command->internal_args_ptr, command_line);
 
+  // calloc to initialize array with NULLs
   command->args = calloc(INITIAL_ARGS_SIZE,  sizeof(char*));
   command->args_size = INITIAL_ARGS_SIZE;
   command->args_count = 0;
@@ -41,9 +42,16 @@ void parser_free_command(struct Command *command) {
 void add_arg(struct Command *command, char* arg) {
   int arg_idx = command->args_count;
 
-  if (arg_idx >= command->args_size) {
-    command->args_size = GROW_ARGS_SIZE(command->args_size);
+  // Check if there's only one position left,
+  // since we always want to keep a trailing NULL for the sake of execve()
+  if (arg_idx >= command->args_size - 1) {
+    int old_args_size = command->args_size;
+    command->args_size = GROW_ARGS_SIZE(old_args_size);
     command->args = realloc(command->args, command->args_size * sizeof(char*));
+    // null out the new positions to make sure the array stays NULL terminated
+    for (int i = old_args_size; i < command->args_size; i++) {
+      command->args[i] = NULL;
+    }
   }
 
   command->args_count = arg_idx + 1;
@@ -122,12 +130,12 @@ struct Command *parse_command(char* command_line) {
       case '>':
 	*curr_idx = '\0';
 	curr_idx++;
-	curr_idx = consume_whitespace(curr_idx);
 	bool append = false;
 	if (*curr_idx == '>') {
 	  append = true;
 	  curr_idx++;
 	}
+        curr_idx = consume_whitespace(curr_idx);
 	add_output(command, curr_idx, append);
         break;
       default:
