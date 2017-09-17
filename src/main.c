@@ -3,23 +3,18 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "write.h"
 #include "command.h"
 #include "parser.h"
 
 #define INPUT_BUFFER_SIZE 1024
-
-#define STDIN 0
-#define STDOUT 1
-#define STDERR 2
-
-void write_out(char *string);
 
 // Read a line from stdin.
 char *read_line() {
   char buffer[INPUT_BUFFER_SIZE];
 
   // TODO handle errors
-  size_t length = read(STDIN, buffer, INPUT_BUFFER_SIZE-1);
+  ssize_t length = read(STDIN_FILENO, buffer, INPUT_BUFFER_SIZE-1);
 
   // TODO handle multiple lines at once?
   
@@ -28,28 +23,6 @@ char *read_line() {
   line[length]='\0';
 
   return line;
-}
-
-// Write a string.
-void write_string(int fd, char *string) {
-  size_t length = strlen(string);
-
-  if (length <= 0) {
-    return;
-  }
-
-  // TODO handle errors
-  write(fd, string, length);
-}
-
-// Write a string to stdout.
-void write_out(char *string) {
-  write_string(STDOUT, string);
-}
-
-// Write a string to stderror.
-void write_error(char *string) {
-  write_string(STDERR, string);
 }
 
 // Print a Command.
