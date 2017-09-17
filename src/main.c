@@ -3,27 +3,12 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "read.h"
 #include "write.h"
 #include "command.h"
 #include "parser.h"
 
 #define INPUT_BUFFER_SIZE 1024
-
-// Read a line from stdin.
-char *read_line() {
-  char buffer[INPUT_BUFFER_SIZE];
-
-  // TODO handle errors
-  ssize_t length = read(STDIN_FILENO, buffer, INPUT_BUFFER_SIZE-1);
-
-  // TODO handle multiple lines at once?
-  
-  char *line = malloc(length + 1);
-  memcpy(line, buffer, length);
-  line[length]='\0';
-
-  return line;
-}
 
 // Print a Command.
 // For debugging purposes.
@@ -59,7 +44,9 @@ void print_command(struct Command *command) {
 
 void main() {
   while(true) {
-    char *line = read_line();
+    struct Reader *reader = create_reader(STDIN_FILENO);
+    
+    char *line = read_until(reader, '\n');
     struct Command *command = parse_command(line);
     print_command(command);
 
