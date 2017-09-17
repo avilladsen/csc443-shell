@@ -21,7 +21,7 @@ $(OBJDIR)/main.o: $(SRCDIR)/main.c $(SRCDIR)/parser.h $(SRCDIR)/command.h
 $(OBJDIR)/parser.o: $(SRCDIR)/parser.c $(SRCDIR)/parser.h $(SRCDIR)/command.h
 
 clean:
-	rm shell $(OBJECTS)
+	rm -f $(BINDIR)/$(TARGET) $(OBJECTS)
 
 .PHONY: clean
 
