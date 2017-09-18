@@ -37,7 +37,14 @@ void print_command(struct Command *command) {
 }
 #endif /* DEBUG_PARSER */
 
-void prompt() {
+// Adding a newline at the end of the prompt makes the test output files much, much clearer.
+#ifdef RUNNING_TEST
+#define SHELL_PROMPT "$ \n"
+#else
+#define SHELL_PROMPT "$ "
+#endif
+
+char *prompt(struct Reader *reader) {
 #ifndef NO_PROMPT
   char cwd[256];
   if (getcwd(cwd, 256) == NULL) {
@@ -45,16 +52,18 @@ void prompt() {
   } else {
     write_out(cwd);
   }
-  write_out("$ ");
+  write_out(SHELL_PROMPT);
 #endif
+
+  return read_until(reader, '\n');
 }
 
+
 void main() {
-  while(true) {
-    prompt();
-    struct Reader *reader = create_reader(STDIN_FILENO);
-    
-    char *line = read_until(reader, '\n');
+  struct Reader *reader = create_reader(STDIN_FILENO);
+
+  char *line = prompt(reader);
+  while(*line != '\0') {
     struct Command *command = parse_command(line);
 
 #ifdef DEBUG_PARSER
@@ -65,5 +74,12 @@ void main() {
 
     free(line);
     parser_free_command(command);
+
+    line = prompt(reader);
   }
+
+  // Should never reach this during normal execution, but what the heck.
+  // This is reached during tests, but is irrelevant.
+  free(line);
+  free_reader(reader);
 }

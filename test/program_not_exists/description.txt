@@ -1,0 +1,2 @@
+Tests trying to run a program that doesn't exit.
+Also tests that the child process spawned for to run the program has exited, by issuing an exit and then another command. If the child process received the exit command, the original shell will get the following command.

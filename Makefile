@@ -21,6 +21,9 @@ noprompt: target
 debugparser: CFLAGS += -DDEBUG_PARSER
 debugparser: target
 
+test: CFLAGS += -DRUNNING_TEST
+test: target
+
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
@@ -38,7 +41,7 @@ $(OBJDIR)/execute.o: $(SRCDIR)/execute.c $(SRCDIR)/write.h $(SRCDIR)/command.h
 clean:
 	rm -f $(BINDIR)/$(TARGET) $(OBJECTS)
 
-.PHONY: target noprompt debugparser clean
+.PHONY: target noprompt debugparser test clean
 
 
 
