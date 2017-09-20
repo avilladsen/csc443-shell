@@ -77,7 +77,6 @@ void remove_file(struct Command *command) {
   }
 
   if (unlink(command->args[1]) < 0) {
-    write_error("shell: rm: ");
     report_error(errno, (char*[]) { "shell: ", command->args[0], ": ", NULL });
   }
 }
@@ -149,14 +148,17 @@ bool validate_command(struct Command *command) {
   return true;
 }
 
-
-
 // OPEN a file descriptor for the command's input.
 // Returns stdin if the command has no input redirection.
 // Returns -1 on error.
 int open_input(struct Command *command) {
   if (command->input == NULL) {
     return STDIN_FILENO;
+  }
+
+  if (command->input[0] == '\0') {
+    write_error("shell: syntax error: expected file after '<'\n");
+    return -1;
   }
 
   int fd_in = open(command->input, O_RDONLY);
@@ -174,6 +176,16 @@ int open_input(struct Command *command) {
 int open_output(struct Command *command) {
   if (command->output == NULL) {
     return STDOUT_FILENO;
+  }
+
+  if (command->output[0] == '\0') {
+    write_error("shell: syntax error: expected file after ");
+    if (command->append_output) {
+      write_error("'>>'\n");
+    } else {
+      write_error("'>'\n");
+    }
+    return -1;
   }
 
   int flags = O_WRONLY | O_CREAT;

@@ -22,8 +22,6 @@ function run_if_exists {
 }
 
 function run_test {
-    echo Running test $1...
-    
     pushd $1 >/dev/null 2>/dev/null
     local test_src=`pwd`
     if [ -f skip ]
@@ -35,6 +33,8 @@ function run_test {
     fi
     popd >/dev/null 2>/dev/null
 
+    echo Running test $1...
+    
     # 0 for pass, 1 for fail
     local test_result=0
     local test_out=`mktemp`
@@ -45,14 +45,14 @@ function run_test {
     run_if_exists "$test_src/setup.sh"
     "$shell" <"$test_src/commands.txt" >"$test_out" 2>"$test_err"
 
-    TESTROOT="$test_root" envsubst < "$test_src/out.txt" | diff --color=always - "$test_out"
+    TESTROOT="$test_root" envsubst < "$test_src/out.txt" | diff --color=always "$test_out" -
     if [ $? == 1 ]
     then
 	echo -e "\e[31mOutput differs!\e[0m"
 	test_result=1
     fi
        
-    TESTROOT="$test_root" envsubst < "$test_src/err.txt" | diff --color=always - "$test_err"
+    TESTROOT="$test_root" envsubst < "$test_src/err.txt" | diff --color=always "$test_err" -
     if [ $? == 1 ]
     then
 	echo -e "\e[31mError output differs!\e[0m"
