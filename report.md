@@ -4,13 +4,13 @@ This is Andrew Villadsen's submission for the shell project of CSC443. See Readm
 
 # Assumptions
 
-One thing that I haven't had the time to look into is the recoverability of errors in reading or writing to stdin, stdout, or stderr. I decided to assume that such errors are uncoverable, and to just make a best effort to inform the user before exiting.
+One thing that I haven't had the time to look into is the recoverability of errors in reading or writing to stdin, stdout, or stderr. I decided to assume that such errors are unrecoverable, and to just make a best effort to inform the user before exiting.
 
 # Design Decisions
 
 I factored the shell into five core pieces of functionality: reading input (reader.h), writing output and errors (writer.h), parsing the command line (parser.h), executing the parsed command (execute.h), and finally the REPL loop itself (main.c). I also separated out the contract between the parser and executor (command.h), so that neither would have to depend on the other.
 
-I originally wanted to isolate the I/O operations to the REPL to make it easier to unit test the components of the shell. However, I quickly realized that it would be difficult to isolate the executor, where pretty much all errors happen, from writing errors. If I were to continue with this project, rather than isolating the executor from writing I would create a writer object that abstracts over writes to out and error, sending them to chosen file descriptors rather than stdout and stderr. Not only would this enable testing, but it would also be a good step towards features like command piping and error redirection.
+I originally wanted to isolate the I/O operations to the REPL to make it easier to unit test the components of the shell. However, I quickly realized that it would be difficult to isolate the executor, where pretty much all errors happen, from writing errors. If I were to continue with this project, rather than isolating the executor from writing I would create a writer object that abstracts over writes to out and error, sending them to chosen file descriptors rather than stdout and stderr. Not only would this enable unit testing, but it would also be a good step towards features like command piping and error redirection.
 
 ## Design for Tests
 

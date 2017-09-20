@@ -28,7 +28,7 @@ While in the `test` directory, run `run_tests.sh` to run all tests for the shell
 
 ## Creating a New Test
 
-While in the `test` directory, run `create_test.sh test_name` to create a new test called "test_name". There will be a new directory under `test` with that name. In that directory, there will be a set of files that describe the test:
+While in the `test` directory, run `./create_test.sh test_name` to create a new test called "test_name". There will be a new directory under `test` with that name. In that directory, there will be a set of files that describe the test:
 
 * `setup.sh`: The test will run inside a temporary directory. This script runs inside that directory before the test to do any necessary setup.
 * `commands.txt`: The input that is piped to the shell.
